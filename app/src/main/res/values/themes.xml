@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.Saveurself" parent="Theme.MaterialComponents.Light" />
+</resources>
