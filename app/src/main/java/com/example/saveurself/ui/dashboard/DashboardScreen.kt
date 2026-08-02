@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -27,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.saveurself.data.Category
 import com.example.saveurself.data.Expense
 import com.example.saveurself.ui.theme.SaveurselfTheme
 import kotlinx.coroutines.launch
@@ -38,7 +40,8 @@ fun DashboardScreen(
     viewModel: ExpenseViewModel = viewModel(),
     onAddExpenseClick: () -> Unit = {}
 ) {
-    val expenses by viewModel.expenses.collectAsState()
+    val expenses by viewModel.filteredExpenses.collectAsState()
+    val selectedCategory by viewModel.selectedCategory.collectAsState()
     val totalSpent by viewModel.totalSpent.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     
@@ -60,16 +63,23 @@ fun DashboardScreen(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.primary
-                )
+                ),
+                windowInsets = WindowInsets.statusBars
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { 
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.navigationBarsPadding()
+            ) 
+        },
         floatingActionButton = {
             LargeFloatingActionButton(
                 onClick = onAddExpenseClick,
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier.navigationBarsPadding()
             ) {
                 Icon(
                     Icons.Default.Add, 
@@ -78,7 +88,7 @@ fun DashboardScreen(
                 )
             }
         },
-        contentWindowInsets = WindowInsets.systemBars
+        contentWindowInsets = WindowInsets.navigationBars
     ) { innerPadding ->
         ListDetailPaneScaffold(
             directive = scaffoldDirective,
@@ -102,6 +112,12 @@ fun DashboardScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontWeight = FontWeight.ExtraBold
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CategoryFilterBar(
+                                categories = listOf("All") + Category.entries.map { it.name },
+                                selectedCategory = selectedCategory ?: "All",
+                                onCategorySelected = viewModel::selectCategory
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             ExpenseList(
@@ -128,6 +144,12 @@ fun DashboardScreen(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Black
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CategoryFilterBar(
+                                categories = listOf("All") + Category.entries.map { it.name },
+                                selectedCategory = selectedCategory ?: "All",
+                                onCategorySelected = viewModel::selectCategory
+                            )
                             Spacer(modifier = Modifier.height(24.dp))
                             ExpenseList(
                                 expenses = expenses,
@@ -142,6 +164,40 @@ fun DashboardScreen(
                 }
             }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryFilterBar(
+    categories: List<String>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    LazyRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 4.dp)
+    ) {
+        items(categories) { category ->
+            FilterChip(
+                selected = selectedCategory == category,
+                onClick = { onCategorySelected(category) },
+                label = { Text(category) },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                    selectedLabelColor = MaterialTheme.colorScheme.primary,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = selectedCategory == category,
+                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    selectedBorderColor = MaterialTheme.colorScheme.primary
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+        }
     }
 }
 

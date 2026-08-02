@@ -16,6 +16,9 @@ class ExpenseViewModel : ViewModel() {
     private val _expenses = MutableStateFlow<List<Expense>>(emptyList())
     val expenses: StateFlow<List<Expense>> = _expenses.asStateFlow()
 
+    private val _selectedCategory = MutableStateFlow<String?>("All")
+    val selectedCategory: StateFlow<String?> = _selectedCategory.asStateFlow()
+
     init {
         // Seed with sample data
         _expenses.value = listOf(
@@ -27,9 +30,24 @@ class ExpenseViewModel : ViewModel() {
         )
     }
 
+    val filteredExpenses: StateFlow<List<Expense>> = kotlinx.coroutines.flow.combine(
+        _expenses,
+        _selectedCategory
+    ) { expenses, category ->
+        if (category == null || category == "All") {
+            expenses
+        } else {
+            expenses.filter { it.category.name == category }
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val totalSpent: StateFlow<Double> = _expenses
         .map { list -> list.sumOf { it.amount } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0.0)
+
+    fun selectCategory(category: String?) {
+        _selectedCategory.value = category
+    }
 
     fun addExpense(description: String, amount: Double, category: Category) {
         val newExpense = Expense(description, amount, category, LocalDate.now())

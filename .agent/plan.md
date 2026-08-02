@@ -2,33 +2,29 @@
 
 Create a simple Personal Expense Tracker. Use a light-green "financial" color motif, also use Red color transitioning from the light-green when total spent is getting 6k+, and use specific colors for categories (e.g., Green for Food, Blue for Transport). Use Material 3 for design elements.
 
-Display a "Total Spent" card at the very top. Below it, show a scrollable list of recent transactions. A Floating Action Button (FAB) opens a BottomSheet or new screen to add an expense.
+Display a "Total Spent" card at the very top. Below it, show a scrollable list of recent transactions. A Floating Action Button (FAB) opens a BottomSheet or new screen to add an expense. Swipe to delete functionality with confirmation and snackbar. Category filtering via horizontal scroll bar.
 
 ## Project Brief
 
 # Project Brief: Personal Expense Tracker
 
-This project is a streamlined Personal Expense Tracker designed to help users monitor their spending with a clear, color-coded visual hierarchy. The app focuses on immediate visibility of financial health and ease of data entry.
-
 ## Features
-*   **Dynamic Spending Overview**: A "Total Spent" card at the top that provides instant feedback, transitioning from a "safe" light-green motif to a red warning color as total spending exceeds 6,000.
-*   **Transaction History**: A scrollable list of recent expenses, featuring category-specific color coding (e.g., Green for Food, Blue for Transport) for quick visual scanning.
-*   **Quick Entry Flow**: A Floating Action Button (FAB) that triggers a BottomSheet or entry screen to rapidly add new expenses.
-*   **Adaptive Dashboard**: A responsive layout that utilizes adaptive components to ensure the financial data is legible and well-structured across phones, tablets, and foldables.
+1. **Dynamic Expenditure Overview**: A primary dashboard card displaying total spent, featuring a color-shifting motif that transitions from financial green to red when expenses exceed $6,000.
+2. **Recent Transactions List**: A Material 3 scrollable list for monitoring expenses, equipped with swipe-to-delete functionality, confirmation dialogs, and undo snackbars.
+3. **Smart Category Filtering**: A horizontal scrollable filter bar that allows users to isolate transactions by category (e.g., Food - Green, Transport - Blue) or view "All" records.
+4. **Instant Expense Entry**: A high-visibility Floating Action Button (FAB) that launches a BottomSheet for quick and easy expense logging.
 
 ## High-Level Technical Stack
-*   **Language**: Kotlin
-*   **UI Framework**: Jetpack Compose with Material 3
-*   **Navigation**: Jetpack Navigation 3 (State-driven)
-*   **Adaptive Strategy**: Compose Material Adaptive library
-*   **Concurrency**: Kotlin Coroutines for asynchronous UI state updates
-
----
-
-**Note**: As the `generate_image` tool is currently unavailable in the environment, the **UI Design Image** section has been omitted.
+- **Kotlin**: Language for robust Android application logic.
+- **Jetpack Compose**: Modern declarative UI framework for building Material 3 interfaces.
+- **Jetpack Navigation 3**: State-driven navigation system for managing app flow and screen transitions.
+- **Compose Material Adaptive**: Core library for ensuring layouts adapt seamlessly to different screen sizes and orientations.
+- **Kotlin Coroutines**: For handling asynchronous tasks and UI state updates.
+- **ViewModel**: Architectural component for managing UI-related data in a lifecycle-conscious way.
+- **Material 3**: Design system for components, theming, and the dynamic color-coding logic.
 
 ## Implementation Steps
-**Total Duration:** 31m 43s
+**Total Duration:** 34m 25s
 
 ### Task_1_Initial_State_and_Dashboard: Define the data model and ViewModel, and implement the main dashboard UI.
 - **Status:** COMPLETED
@@ -68,20 +64,31 @@ This project is a streamlined Personal Expense Tracker designed to help users mo
   - A snackbar message is shown after a successful deletion.
 - **Duration:** 3m 17s
 
-### Task_5_Run_and_Verify: Perform a final build and verify the application's stability and requirements.
+### Task_5_Category_Filtering: Implement category filtering via a horizontal scroll bar.
+- **Status:** COMPLETED
+- **Updates:** Implemented Category Filtering:
+- Updated `ExpenseViewModel` with `selectedCategory` state and `filteredExpenses` logic.
+- Added a `CategoryFilterBar` to `DashboardScreen` using a horizontal scrollable `LazyRow` with Material 3 `FilterChip`s.
+- Integrated filtering logic: clicking a chip updates the UI state immediately.
+- Included an "All" option to reset the filter.
+- Ensured consistency with the financial theme and adaptive layout.
+- Verified compatibility with swipe-to-delete.
+- **Acceptance Criteria:**
+  - Horizontal scroll bar with category chips (All, Food, Transport, etc.) implemented
+  - Selecting a category filters the transaction list in real-time
+  - Filtering reflects correctly in the ViewModel state
+- **Duration:** 2m 42s
+
+### Task_6_Run_and_Verify: Perform a final build and verify the application's stability, requirements, and recent fixes.
 - **Status:** IN_PROGRESS
-- **Updates:** Critic agent found issues:
-1. Total Spent card is not reactive to list changes.
-2. Swipe state doesn't reset if deletion is cancelled.
-3. Seed data is > 6000, masking the initial green state.
-Reopening for refinement.
 - **Acceptance Criteria:**
   - Project builds successfully
   - App does not crash during usage
-  - Core features (dynamic coloring, adding expenses, listing, swipe-to-delete) function correctly
+  - Core features (dynamic coloring, adding expenses, listing, swipe-to-delete, category filtering) function correctly
+  - Reactivity and swipe-to-delete fixes are verified
   - Critic_agent verifies stability and alignment with user requirements
   - make sure all existing tests pass
   - build pass
   - app does not crash
-- **StartTime:** 2026-08-02 13:17:39 GMT+06:00
+- **StartTime:** 2026-08-02 15:19:23 GMT+06:00
 
