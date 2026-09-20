@@ -49,6 +49,9 @@ fun DashboardScreen(
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val scaffoldDirective = calculatePaneScaffoldDirective(adaptiveInfo)
     val isSinglePane = scaffoldDirective.maxHorizontalPartitions == 1
+    
+    val tabs = listOf("Current Month", "Calendar")
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
@@ -74,96 +77,135 @@ fun DashboardScreen(
             ) 
         },
         floatingActionButton = {
-            LargeFloatingActionButton(
+            SmallFloatingActionButton(
                 onClick = onAddExpenseClick,
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.navigationBarsPadding()
             ) {
                 Icon(
                     Icons.Default.Add, 
                     contentDescription = "Add Expense",
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
         },
         contentWindowInsets = WindowInsets.navigationBars
     ) { innerPadding ->
-        ListDetailPaneScaffold(
-            directive = scaffoldDirective,
-            value = navigator.scaffoldValue,
-            modifier = Modifier.padding(innerPadding),
-            listPane = {
-                AnimatedPane {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 24.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        TotalSpentCard(totalSpent)
-                        
-                        if (isSinglePane) {
-                            Spacer(modifier = Modifier.height(32.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            SecondaryTabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = MaterialTheme.colorScheme.background,
+                divider = {}
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { 
                             Text(
-                                text = "Recent Transactions",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontWeight = FontWeight.ExtraBold
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            CategoryFilterBar(
-                                categories = listOf("All") + Category.entries.map { it.name },
-                                selectedCategory = selectedCategory ?: "All",
-                                onCategorySelected = viewModel::selectCategory
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            ExpenseList(
-                                expenses = expenses,
-                                onDeleteExpense = viewModel::deleteExpense,
-                                snackbarHostState = snackbarHostState
-                            )
+                                text = title,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = if (selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal
+                            ) 
                         }
-                    }
+                    )
                 }
-            },
-            detailPane = {
-                AnimatedPane {
-                    if (!isSinglePane) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 24.dp, vertical = 16.dp)
-                        ) {
-                            Text(
-                                text = "Transaction History",
-                                style = MaterialTheme.typography.headlineSmall,
-                                modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Black
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                            CategoryFilterBar(
-                                categories = listOf("All") + Category.entries.map { it.name },
-                                selectedCategory = selectedCategory ?: "All",
-                                onCategorySelected = viewModel::selectCategory
-                            )
-                            Spacer(modifier = Modifier.height(24.dp))
-                            ExpenseList(
-                                expenses = expenses,
-                                onDeleteExpense = viewModel::deleteExpense,
-                                snackbarHostState = snackbarHostState
-                            )
-                        }
-                    } else {
-                        // Empty detail pane for single pane mode
-                        Box(Modifier.fillMaxSize())
+            }
+
+            Box(modifier = Modifier.weight(1f)) {
+                when (selectedTabIndex) {
+                    0 -> {
+                        ListDetailPaneScaffold(
+                            directive = scaffoldDirective,
+                            value = navigator.scaffoldValue,
+                            modifier = Modifier.fillMaxSize(),
+                            listPane = {
+                                AnimatedPane {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 24.dp, vertical = 16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        TotalSpentCard(totalSpent)
+                                        
+                                        if (isSinglePane) {
+                                            Spacer(modifier = Modifier.height(32.dp))
+                                            Text(
+                                                text = "Recent Transactions",
+                                                style = MaterialTheme.typography.titleLarge,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                fontWeight = FontWeight.ExtraBold
+                                            )
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            CategoryFilterBar(
+                                                categories = listOf("All") + Category.entries.map { it.name },
+                                                selectedCategory = selectedCategory ?: "All",
+                                                onCategorySelected = viewModel::selectCategory
+                                            )
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            ExpenseList(
+                                                expenses = expenses,
+                                                onDeleteExpense = viewModel::deleteExpense,
+                                                snackbarHostState = snackbarHostState
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            detailPane = {
+                                AnimatedPane {
+                                    if (!isSinglePane) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(horizontal = 24.dp, vertical = 16.dp)
+                                        ) {
+                                            Text(
+                                                text = "Transaction History",
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                color = MaterialTheme.colorScheme.primary,
+                                                fontWeight = FontWeight.Black
+                                            )
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            CategoryFilterBar(
+                                                categories = listOf("All") + Category.entries.map { it.name },
+                                                selectedCategory = selectedCategory ?: "All",
+                                                onCategorySelected = viewModel::selectCategory
+                                            )
+                                            Spacer(modifier = Modifier.height(24.dp))
+                                            ExpenseList(
+                                                expenses = expenses,
+                                                onDeleteExpense = viewModel::deleteExpense,
+                                                snackbarHostState = snackbarHostState
+                                            )
+                                        }
+                                    } else {
+                                        // Empty detail pane for single pane mode
+                                        Box(Modifier.fillMaxSize())
+                                    }
+                                }
+                            }
+                        )
+                    }
+                    1 -> {
+                        CalendarScreen(
+                            viewModel = viewModel,
+                            onDeleteExpense = viewModel::deleteExpense,
+                            snackbarHostState = snackbarHostState
+                        )
                     }
                 }
             }
-        )
+        }
     }
 }
 
