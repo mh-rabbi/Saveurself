@@ -58,7 +58,9 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 AddExpenseForm(
                                     onAddExpense = { desc, amt, cat ->
-                                        expenseViewModel.addExpense(desc, amt, cat, expenseViewModel.selectedDate.value)
+                                        expenseViewModel.addExpense(desc,
+                                            amt, cat,
+                                            expenseViewModel.selectedDate.value)
                                     },
                                     onDismiss = { backStack.removeAt(backStack.size - 1) }
                                 )
