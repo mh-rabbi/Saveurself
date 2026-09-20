@@ -81,8 +81,11 @@ fun MonthCalendar(
     onDateSelected: (LocalDate) -> Unit
 ) {
     var currentMonth by remember { mutableStateOf(YearMonth.from(selectedDate)) }
+
     val daysInMonth = currentMonth.lengthOfMonth()
+
     val firstDayOfMonth = currentMonth.atDay(1).dayOfWeek
+
     val days = (1..daysInMonth).toList()
     
     // Day names (Mon, Tue, etc.)
